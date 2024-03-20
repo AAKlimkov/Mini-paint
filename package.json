@@ -20,9 +20,10 @@
     "@babel/core": "^7.23.7",
     "@babel/preset-env": "^7.23.8",
     "@testing-library/jest-dom": "^6.4.2",
+    "@types/firebase": "^3.2.1",
     "@types/node": "^20.11.24",
-    "@types/react": "^18.2.63",
-    "@types/react-dom": "^18.2.19",
+    "@types/react": "^18.2.67",
+    "@types/react-dom": "^18.2.22",
     "@types/webpack": "^5.28.5",
     "@types/webpack-dev-server": "^4.7.2",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
@@ -53,16 +54,19 @@
     "style-loader": "^3.3.4",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.2",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.2"
   },
   "dependencies": {
     "eslint-config-airbnb-typescript": "^18.0.0",
+    "firebase": "^10.9.0",
     "material-ui-study": "^1.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.2"
+    "react-redux": "^9.1.0",
+    "react-router-dom": "^6.22.3",
+    "redux": "^5.0.1"
   }
 }
