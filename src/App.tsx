@@ -1,19 +1,22 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import WelcomePage from "./pages/WelcomePage";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import LoginPage from "./pages/LoginPage/LoginPage";
+import RegisterPage from "./pages/RegisterPage/RegisterPage";
+import FilesPage from "./pages/FilesPage/FilesPage";
+// import { router } from "./routes/router";
 
-const App: React.FC = () => (
-  <Router>
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/welcome" element={<WelcomePage />} />
-    </Routes>
-  </Router>
-);
+const router = createBrowserRouter([
+  { path: "/", element: <LoginPage /> },
+  { path: "/register", element: <RegisterPage /> },
+  { path: "/files", element: <FilesPage /> },
+]);
+
+function App() {
+  return (
+    <div>
+      <RouterProvider router={router} />
+    </div>
+  );
+}
 
 export default App;

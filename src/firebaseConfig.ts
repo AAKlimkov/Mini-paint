@@ -1,3 +1,10 @@
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
+// import process from "process";
+
+// TODO move config to .env file
+
 const firebaseConfig = {
   apiKey: "AIzaSyDt9ID4zlANYuxEGLFUa6rUZ7XTZDp_HCw",
   authDomain: "mini-paint-3bfc5.firebaseapp.com",
@@ -8,4 +15,6 @@ const firebaseConfig = {
   measurementId: "G-X3N0170HNM",
 };
 
-export default firebaseConfig;
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const storage = getStorage(app);

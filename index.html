@@ -1,53 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Простейший Paint на HTML5 Canvas</title>
-<style>
-    canvas {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Простейший Paint на HTML5 Canvas</title>
+    <style>
+      canvas {
         border: 1px solid #000;
-    }
-</style>
-</head>
-<body>
+      }
+    </style>
+  </head>
+  <body>
     <div id="root"></div>
-<canvas id="paintCanvas" width="800" height="600"></canvas>
-
-<script>
-    var canvas = document.getElementById('paintCanvas');
-    var ctx = canvas.getContext('2d');
-    
-    var painting = false;
-
-    function startPainting(event) {
-        painting = true;
-        draw(event);
-    }
-
-    function stopPainting() {
-        painting = false;
-        ctx.beginPath();
-    }
-
-    function draw(event) {
-        if (!painting) return;
-
-        var x = event.pageX - canvas.offsetLeft;
-        var y = event.pageY - canvas.offsetTop;
-
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round'; 
-        ctx.strokeStyle = '#0000ff';
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-
-    canvas.addEventListener('mousedown', startPainting);
-    canvas.addEventListener('mouseup', stopPainting);
-    canvas.addEventListener('mousemove', draw);
-</script>
-</body>
+  </body>
 </html>

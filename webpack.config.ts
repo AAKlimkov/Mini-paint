@@ -24,7 +24,9 @@ const config: Configuration = {
   devServer: {
     open: true,
     host: "localhost",
+
     port: process.env.port ?? 3000,
+    historyApiFallback: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
