@@ -1,5 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Box, Typography, TextField, Select, MenuItem } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Select,
+  MenuItem,
+  Button,
+} from "@mui/material";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 type DrawingTools =
   | "pencil"
@@ -18,6 +26,25 @@ const CanvasPage: React.FC = () => {
     x: 0,
     y: 0,
   });
+
+  const uploadImageToFirebase = async () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const storage = getStorage();
+
+      const fileRef = ref(storage, `${Date.now()}.png`);
+
+      try {
+        const snapshot = await uploadBytes(fileRef, blob);
+        console.log("Uploaded a blob or file!", snapshot);
+      } catch (error) {
+        console.error("Upload failed", error);
+      }
+    }, "image/png");
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -138,6 +165,7 @@ const CanvasPage: React.FC = () => {
         onMouseUp={handleMouseUp}
         style={{ border: "2px solid #000", cursor: "crosshair" }}
       />
+      <Button onClick={uploadImageToFirebase}>Save Drawing</Button>
     </Box>
   );
 };
