@@ -1,9 +1,10 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
+import { TextField } from "@mui/material";
 import { auth } from "../../firebaseConfig";
 import styles from "./RegisterPage.module.less";
 
@@ -54,6 +55,9 @@ const RegisterPage: React.FC = () => {
           Register
         </Button>
       </form>
+      <div>
+        Already have an account? <Link to="/login">Login here</Link>
+      </div>
     </div>
   );
 };

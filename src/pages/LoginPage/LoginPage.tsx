@@ -1,14 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
+import { TextField } from "@mui/material";
 import { FirebaseError } from "firebase/app";
 import { useForm } from "react-hook-form";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { auth } from "../../firebaseConfig";
 import styles from "./LoginPage.module.less";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { monitorAuthState } from "../../features/auth/authSlice";
 
 const LoginPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user);
+
+  useEffect(() => {
+    dispatch(monitorAuthState());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      console.log("User is logged in:", user.displayName || user.email);
+    } else {
+      console.log("User is not logged in.");
+    }
+  }, [user]);
   const navigate = useNavigate();
   const {
     register,
@@ -56,6 +72,9 @@ const LoginPage: React.FC = () => {
           Log In
         </Button>
       </form>
+      <div>
+        Don't have an account? <Link to="/register">Register here</Link>
+      </div>
     </div>
   );
 };

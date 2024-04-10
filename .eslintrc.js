@@ -33,6 +33,10 @@ module.exports = {
       { ts: "never", tsx: "never" },
     ],
     "prettier/prettier": "error",
+    "no-param-reassign": [
+      "error",
+      { props: true, ignorePropertyModificationsFor: ["state"] },
+    ],
   },
   settings: {
     "import/resolver": {
