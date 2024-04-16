@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import Button from "@mui/material/Button";
@@ -9,6 +9,7 @@ import { auth } from "../../firebaseConfig";
 import styles from "./RegisterPage.module.less";
 
 const RegisterPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -17,6 +18,7 @@ const RegisterPage: React.FC = () => {
   const onSubmit = async (data: { email: string; password: string }) => {
     try {
       await createUserWithEmailAndPassword(auth, data.email, data.password);
+      navigate("/files");
     } catch (error) {
       if (error instanceof FirebaseError) {
         console.error("Registration error:", error.message);

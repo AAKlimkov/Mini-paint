@@ -8,6 +8,8 @@ import {
   Button,
 } from "@mui/material";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../store/hooks";
 
 type DrawingTools =
   | "pencil"
@@ -27,9 +29,20 @@ const CanvasPage: React.FC = () => {
     y: 0,
   });
 
+  const user = useAppSelector((state) => state.auth.user.email);
+
+  const navigate = useNavigate();
+
   const uploadImageToFirebase = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const metadata = {
+      contentType: "image/png",
+      customMetadata: {
+        user,
+      },
+    };
 
     canvas.toBlob(async (blob) => {
       if (!blob) return;
@@ -38,7 +51,7 @@ const CanvasPage: React.FC = () => {
       const fileRef = ref(storage, `${Date.now()}.png`);
 
       try {
-        const snapshot = await uploadBytes(fileRef, blob);
+        const snapshot = await uploadBytes(fileRef, blob, metadata);
         console.log("Uploaded a blob or file!", snapshot);
       } catch (error) {
         console.error("Upload failed", error);
@@ -54,6 +67,10 @@ const CanvasPage: React.FC = () => {
     }
   }, [lineWidth]);
 
+  const handleReturnToFiles = () => {
+    navigate("/files");
+  };
+
   const handleMouseDown = ({
     nativeEvent,
   }: React.MouseEvent<HTMLCanvasElement>) => {
@@ -65,7 +82,7 @@ const CanvasPage: React.FC = () => {
       if (context) {
         context.beginPath();
         context.moveTo(offsetX, offsetY);
-        context.strokeStyle = color; // Set color here
+        context.strokeStyle = color;
       }
     }
   };
@@ -77,6 +94,7 @@ const CanvasPage: React.FC = () => {
     const { offsetX, offsetY } = nativeEvent;
     const context = canvasRef.current?.getContext("2d");
     if (context) {
+      context.strokeStyle = color;
       context.lineTo(offsetX, offsetY);
       context.stroke();
     }
@@ -92,6 +110,9 @@ const CanvasPage: React.FC = () => {
     const context = canvasRef.current?.getContext("2d");
     if (context) {
       context.lineWidth = lineWidth;
+      context.strokeStyle = color;
+      context.fillStyle = color;
+
       if (drawingTool === "rectangle") {
         context.strokeRect(
           startPos.x,
@@ -165,6 +186,7 @@ const CanvasPage: React.FC = () => {
         onMouseUp={handleMouseUp}
         style={{ border: "2px solid #000", cursor: "crosshair" }}
       />
+      <Button onClick={handleReturnToFiles}>Back to files</Button>
       <Button onClick={uploadImageToFirebase}>Save Drawing</Button>
     </Box>
   );

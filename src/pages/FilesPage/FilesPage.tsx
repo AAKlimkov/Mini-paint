@@ -1,38 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { Suspense, lazy, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { listAll, getDownloadURL, ref } from "firebase/storage";
+import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 
-import { storage } from "../../firebaseConfig";
 // import styles from "./FilesPage.module.less";
 import { logout } from "../../features/auth/authSlice";
 import { useAppDispatch } from "../../store/hooks";
 
 const FilesPage: React.FC = () => {
-  const [files, setFiles] = useState<{ url: string; name: string }[]>([]);
+  const [open, setOpen] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState("");
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    const fetchFiles = async () => {
-      const filesRef = ref(storage, "gs://mini-paint-3bfc5.appspot.com/");
-      const snapshot = await listAll(filesRef);
-      const fileUrls = await Promise.all(
-        snapshot.items.map(async (item) => ({
-          url: await getDownloadURL(item),
-          name: item.name,
-        })),
-      );
-      setFiles(fileUrls);
-    };
-
-    fetchFiles().catch(console.error);
-  }, []);
+  const FilesList = lazy(() => import("./components/FilesList"));
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -40,30 +22,16 @@ const FilesPage: React.FC = () => {
   };
 
   const handleCreateNewImage = () => {
-    navigate("/create-image"); // Navigate to the CanvasPage
+    navigate("/create-image");
+  };
+  const handleOpenModal = (imageUrl: string) => {
+    setSelectedImageUrl(imageUrl);
+    setOpen(true);
   };
 
-  const downloadFile = async (url: string, name: string) => {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Network response was not ok");
-
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-
-      const anchor = document.createElement("a");
-      anchor.href = blobUrl;
-      anchor.download = name;
-      document.body.appendChild(anchor); // Required for Firefox
-      anchor.click();
-
-      window.URL.revokeObjectURL(blobUrl);
-      document.body.removeChild(anchor);
-    } catch (error) {
-      console.error("Download failed:", error);
-    }
+  const handleCloseModal = () => {
+    setOpen(false);
   };
-
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
       <Button
@@ -73,30 +41,23 @@ const FilesPage: React.FC = () => {
       >
         Sign Out
       </Button>
-      {files.map((file, index) => (
-        <Card key={index} sx={{ maxWidth: 345 }}>
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-              {file.name}
-            </Typography>
-            {/* Assuming all files are images for preview. Adjust if needed. */}
-            <img
-              src={file.url}
-              alt={file.name}
-              style={{ width: "100%", height: "auto", marginBottom: "10px" }}
-            />
-          </CardContent>
-          <CardActions>
-            <Button
-              size="small"
-              onClick={() => downloadFile(file.url, file.name)}
-            >
-              Download
-            </Button>
-          </CardActions>
-        </Card>
-      ))}
-      <button onClick={handleCreateNewImage}>Create New Image</button>
+      <Button
+        variant="outlined"
+        onClick={handleCreateNewImage}
+        style={{ marginBottom: "20px" }}
+      >
+        Create New Image
+      </Button>
+      <Suspense fallback={<div>Loading...</div>}>
+        <FilesList onImageClick={handleOpenModal} />
+      </Suspense>
+
+      <Dialog open={open} onClose={handleCloseModal}>
+        <DialogTitle>Image Preview</DialogTitle>
+        <DialogContent>
+          <img src={selectedImageUrl} alt="Preview" style={{ width: "100%" }} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
