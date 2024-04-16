@@ -1,37 +1,16 @@
-import React, { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-import { listAll, getDownloadURL, ref } from "firebase/storage";
+import React from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { storage } from "../../../firebaseConfig";
 
 interface FilesListProps {
   onImageClick: (imageUrl: string) => void;
+  files: Array<{ name: string; url: string }>;
 }
 
-const FilesList: React.FC<FilesListProps> = ({ onImageClick }) => {
-  const [files, setFiles] = useState<{ url: string; name: string }[]>([]);
-  //   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchFiles = async () => {
-      const filesRef = ref(storage, "gs://mini-paint-3bfc5.appspot.com/");
-      const snapshot = await listAll(filesRef);
-      const fileUrls = await Promise.all(
-        snapshot.items.map(async (item) => ({
-          url: await getDownloadURL(item),
-          name: item.name,
-        })),
-      );
-      setFiles(fileUrls);
-    };
-
-    fetchFiles().catch(console.error);
-  }, []);
-
+const FilesList: React.FC<FilesListProps> = ({ onImageClick, files }) => {
   const downloadFile = async (url: string, name: string) => {
     try {
       const response = await fetch(url);
@@ -74,13 +53,13 @@ const FilesList: React.FC<FilesListProps> = ({ onImageClick }) => {
           <CardActions>
             <Button
               size="small"
-              onClick={() => downloadFile(file.url, file.name)}
+              onClick={(event) => {
+                event.stopPropagation();
+                downloadFile(file.url, file.name);
+              }}
             >
               Download
             </Button>
-            {/* <Button size="small" onClick={() => handleEditImage(file.name)}>
-              Edit
-            </Button> */}
           </CardActions>
         </Card>
       ))}

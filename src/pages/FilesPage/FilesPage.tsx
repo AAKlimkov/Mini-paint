@@ -1,20 +1,59 @@
-import React, { Suspense, lazy, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dialog, DialogContent, DialogTitle } from "@mui/material";
-
-import Button from "@mui/material/Button";
-
-// import styles from "./FilesPage.module.less";
+import { listAll, getDownloadURL, ref, getMetadata } from "firebase/storage";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  SelectChangeEvent,
+} from "@mui/material";
 import { logout } from "../../features/auth/authSlice";
 import { useAppDispatch } from "../../store/hooks";
+import { storage } from "../../firebaseConfig";
+import FileListContainer from "./components/FileListContainer";
+import SignOutAndCreateButtons from "./components/SignOutAndCreateButtons";
+import UserFilter from "./components/UserFilter";
 
 const FilesPage: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
+  const [files, setFiles] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [userOptions, setUserOptions] = useState([]);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const FilesList = lazy(() => import("./components/FilesList"));
+  useEffect(() => {
+    const fetchFiles = async () => {
+      const filesRef = ref(storage, "gs://mini-paint-3bfc5.appspot.com/");
+      const response = await listAll(filesRef);
+      const data = await Promise.all(
+        response.items.map(async (item) => {
+          const metadata = await getMetadata(item);
+          return {
+            url: await getDownloadURL(item),
+            name: item.name,
+            user: metadata.customMetadata.user,
+          };
+        }),
+      );
+      setFiles(data);
+      const users = Array.from(new Set(data.map((file) => file.user))); // Extract unique users
+      setUserOptions(users);
+    };
+    fetchFiles();
+  }, []);
+
+  const handleUserSelectionChange = (event: SelectChangeEvent<string[]>) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedUsers(typeof value === "string" ? value.split(",") : value);
+  };
+
+  const filteredFiles = files.filter(
+    (file) => selectedUsers.length === 0 || selectedUsers.includes(file.user),
+  );
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -24,6 +63,7 @@ const FilesPage: React.FC = () => {
   const handleCreateNewImage = () => {
     navigate("/create-image");
   };
+
   const handleOpenModal = (imageUrl: string) => {
     setSelectedImageUrl(imageUrl);
     setOpen(true);
@@ -32,26 +72,19 @@ const FilesPage: React.FC = () => {
   const handleCloseModal = () => {
     setOpen(false);
   };
-  return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-      <Button
-        variant="outlined"
-        onClick={handleLogout}
-        style={{ marginBottom: "20px" }}
-      >
-        Sign Out
-      </Button>
-      <Button
-        variant="outlined"
-        onClick={handleCreateNewImage}
-        style={{ marginBottom: "20px" }}
-      >
-        Create New Image
-      </Button>
-      <Suspense fallback={<div>Loading...</div>}>
-        <FilesList onImageClick={handleOpenModal} />
-      </Suspense>
 
+  return (
+    <div>
+      <SignOutAndCreateButtons
+        onSignOut={handleLogout}
+        onCreateImage={handleCreateNewImage}
+      />
+      <UserFilter
+        selectedUsers={selectedUsers}
+        userOptions={userOptions}
+        handleUserSelectionChange={handleUserSelectionChange}
+      />
+      <FileListContainer files={filteredFiles} onImageClick={handleOpenModal} />
       <Dialog open={open} onClose={handleCloseModal}>
         <DialogTitle>Image Preview</DialogTitle>
         <DialogContent>

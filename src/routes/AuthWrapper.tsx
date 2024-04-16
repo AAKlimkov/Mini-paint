@@ -9,7 +9,6 @@ interface AuthWrapperProps {
 
 const AuthWrapper = ({ children }: AuthWrapperProps) => {
   const user = useAppSelector((state) => state.auth.user);
-  console.log(user);
 
   if (!user && !user?.email) {
     return <Navigate to="/login" replace />;
