@@ -8,6 +8,7 @@ import {
   Button,
 } from "@mui/material";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
+
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 
@@ -22,13 +23,10 @@ const CanvasPage: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#000000");
-  const [lineWidth, setLineWidth] = useState<number>(2);
+  const [lineWidth, setLineWidth] = useState(2);
   const [drawingTool, setDrawingTool] = useState<DrawingTools>("pencil");
-  const [startPos, setStartPos] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
-
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [image, setImage] = useState<string | null>(null);
   const user = useAppSelector((state) => state.auth.user.email);
 
   const navigate = useNavigate();
@@ -58,7 +56,6 @@ const CanvasPage: React.FC = () => {
       }
     }, "image/png");
   };
-
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
@@ -67,50 +64,18 @@ const CanvasPage: React.FC = () => {
     }
   }, [lineWidth]);
 
-  const handleReturnToFiles = () => {
-    navigate("/files");
-  };
-
-  const handleMouseDown = ({
-    nativeEvent,
-  }: React.MouseEvent<HTMLCanvasElement>) => {
-    const { offsetX, offsetY } = nativeEvent;
-    setStartPos({ x: offsetX, y: offsetY });
-    if (drawingTool === "pencil") {
-      setIsDrawing(true);
-      const context = canvasRef.current?.getContext("2d");
-      if (context) {
-        context.beginPath();
-        context.moveTo(offsetX, offsetY);
-        context.strokeStyle = color;
-      }
-    }
-  };
-
-  const handleMouseMove = ({
-    nativeEvent,
-  }: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || drawingTool !== "pencil") return;
-    const { offsetX, offsetY } = nativeEvent;
+  const draw = (offsetX: number, offsetY: number) => {
+    const img = new Image();
+    img.src = image!;
     const context = canvasRef.current?.getContext("2d");
-    if (context) {
-      context.strokeStyle = color;
-      context.lineTo(offsetX, offsetY);
-      context.stroke();
-    }
-  };
-
-  const handleMouseUp = ({
-    nativeEvent,
-  }: React.MouseEvent<HTMLCanvasElement>) => {
-    if (drawingTool === "pencil") {
-      setIsDrawing(false);
-    }
-    const { offsetX, offsetY } = nativeEvent;
-    const context = canvasRef.current?.getContext("2d");
-    if (context) {
-      context.lineWidth = lineWidth;
-      context.strokeStyle = color;
+    img.onload = () => {
+      context.clearRect(
+        0,
+        0,
+        canvasRef.current!.width,
+        canvasRef.current!.height,
+      );
+      context.drawImage(img, 0, 0);
       context.fillStyle = color;
 
       if (drawingTool === "rectangle") {
@@ -121,6 +86,7 @@ const CanvasPage: React.FC = () => {
           offsetY - startPos.y,
         );
       } else if (drawingTool === "filledRectangle") {
+        context.fillStyle = color;
         context.fillRect(
           startPos.x,
           startPos.y,
@@ -142,8 +108,59 @@ const CanvasPage: React.FC = () => {
         context.arc(startPos.x, startPos.y, radius, 0, 2 * Math.PI);
         context.fill();
       }
+    };
+  };
+
+  const handleMouseDown = ({
+    nativeEvent,
+  }: React.MouseEvent<HTMLCanvasElement>) => {
+    const { offsetX, offsetY } = nativeEvent;
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    setStartPos({ x: offsetX, y: offsetY });
+    setIsDrawing(true);
+    if (context && drawingTool === "pencil") {
+      context.beginPath();
+      context.moveTo(offsetX, offsetY);
+    }
+
+    if (
+      ["rectangle", "filledRectangle", "circle", "filledCircle"].includes(
+        drawingTool,
+      )
+    ) {
+      setImage(canvasRef.current?.toDataURL());
     }
   };
+
+  const handleMouseMove = ({
+    nativeEvent,
+  }: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+    const { offsetX, offsetY } = nativeEvent;
+    const context = canvasRef.current?.getContext("2d");
+    if (!context) return;
+
+    context.strokeStyle = color;
+    context.lineWidth = lineWidth;
+
+    if (drawingTool === "pencil") {
+      context.lineTo(offsetX, offsetY);
+      context.stroke();
+    } else {
+      draw(offsetX, offsetY);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDrawing(false);
+    const canvas = canvasRef.current;
+    if (canvas && drawingTool === "pencil") {
+      setImage(canvas.toDataURL()); // Update the snapshot only for pencil after drawing is complete
+    }
+  };
+
+  const handleReturnToFiles = () => navigate("/files");
 
   return (
     <Box>
