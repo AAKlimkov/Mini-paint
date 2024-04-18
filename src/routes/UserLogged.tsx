@@ -9,9 +9,8 @@ interface UserLoggedProps {
 
 const UserLogged = ({ children }: UserLoggedProps) => {
   const user = useAppSelector((state) => state.auth.user);
-  console.log(user);
 
-  if (user) {
+  if (user && user.email) {
     return <Navigate to="/files" replace />;
   }
 

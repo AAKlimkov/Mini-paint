@@ -34,6 +34,7 @@ const CanvasPage: React.FC = () => {
   const uploadImageToFirebase = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    if (!user) return;
 
     const metadata = {
       contentType: "image/png",

@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import Button from "@mui/material/Button";
 import { TextField } from "@mui/material";
 import { FirebaseError } from "firebase/app";
@@ -37,8 +38,12 @@ const LoginPage: React.FC = () => {
 
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
-      navigate("/files");
+      toast.success("Your are logged in");
+      setTimeout(() => {
+        navigate("/files");
+      }, 1500);
     } catch (error) {
+      toast.error("Something go wrong");
       if (error instanceof FirebaseError) {
         console.error("Login error:", error.message);
       } else {
@@ -75,6 +80,7 @@ const LoginPage: React.FC = () => {
       <div>
         Don't have an account? <Link to="/register">Register here</Link>
       </div>
+      <Toaster />
     </div>
   );
 };
