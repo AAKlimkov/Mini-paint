@@ -9,10 +9,13 @@ import {
 } from "@mui/material";
 import { logout } from "../../features/auth/authSlice";
 import { useAppDispatch } from "../../store/hooks";
-import { storage } from "../../firebaseConfig";
-import FileListContainer from "./components/FileListContainer";
+import { firebaseConfig, storage } from "../../firebaseConfig";
 import SignOutAndCreateButtons from "./components/SignOutAndCreateButtons";
 import UserFilter from "./components/UserFilter";
+
+const FileListContainer = React.lazy(
+  () => import("./components/FileListContainer"),
+);
 
 const FilesPage: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -20,12 +23,13 @@ const FilesPage: React.FC = () => {
   const [files, setFiles] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [userOptions, setUserOptions] = useState([]);
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     const fetchFiles = async () => {
-      const filesRef = ref(storage, "gs://mini-paint-3bfc5.appspot.com/");
+      const filesRef = ref(storage, `gs://${firebaseConfig.storageBucket}`);
       const response = await listAll(filesRef);
       const data = await Promise.all(
         response.items.map(async (item) => {

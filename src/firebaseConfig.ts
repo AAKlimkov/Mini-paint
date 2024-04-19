@@ -5,7 +5,7 @@ import { getStorage } from "firebase/storage";
 
 // TODO move config to .env file
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyDt9ID4zlANYuxEGLFUa6rUZ7XTZDp_HCw",
   authDomain: "mini-paint-3bfc5.firebaseapp.com",
   projectId: "mini-paint-3bfc5",

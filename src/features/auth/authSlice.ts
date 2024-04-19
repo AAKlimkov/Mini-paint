@@ -24,8 +24,6 @@ export const monitorAuthState = createAsyncThunk(
     try {
       return await new Promise<SimplifiedUser | null>((resolve) => {
         auth.onAuthStateChanged((user) => {
-          console.log(user);
-
           if (user) {
             const userData = {
               uid: user.uid,

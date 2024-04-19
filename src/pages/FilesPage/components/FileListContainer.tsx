@@ -1,5 +1,6 @@
-import React, { Suspense } from "react";
-import FilesList from "./FilesList";
+import React from "react";
+
+const FilesList = React.lazy(() => import("./FilesList"));
 
 interface FileListContainerProps {
   files: Array<{ url: string; name: string; user?: string }>;
@@ -11,9 +12,7 @@ const FileListContainer: React.FC<FileListContainerProps> = ({
   onImageClick,
 }) => (
   <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-    <Suspense fallback={<div>Loading...</div>}>
-      <FilesList files={files} onImageClick={onImageClick} />
-    </Suspense>
+    <FilesList files={files} onImageClick={onImageClick} />
   </div>
 );
 

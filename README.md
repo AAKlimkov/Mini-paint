@@ -1,12 +1,5 @@
-# 🚀 Welcome to your new awesome project!
+# 🚀 Welcome to mini-pain!
 
-This is basic configuration for new React apps.
+Task: https://drive.google.com/file/u/2/d/19cb4whI_HUVPzuaPyaj5r6hGotIVnhho/view
 
-Basic stack:
-
-*React
-*TypeScript
-*Less
-*Prettier
-*ElSint
-*Husky
+to run application - npm run dev
