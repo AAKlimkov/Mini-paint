@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import LoginForm from "./Components/LoginForm";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -32,12 +32,8 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className={styles.registerFormContainer}>
-      <h2>Login to account</h2>
       <Toaster />
       <LoginForm onSuccess={handleLoginSuccess} onError={handleLoginError} />
-      <div className={styles.redirectLink}>
-        <Link to="/register">Don't have an account? Register here!</Link>
-      </div>
     </div>
   );
 };
