@@ -1,10 +1,12 @@
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { getStorage, ref, uploadBytes, deleteObject } from "firebase/storage";
 import toast from "react-hot-toast";
 import { UploadImageParams } from "../types/types";
 
 const uploadImageToFirebase = async ({
   canvasRef,
   user,
+  previousFilePath,
+  filePath,
 }: UploadImageParams) => {
   const canvas = canvasRef.current;
   if (!canvas || !user) {
@@ -14,9 +16,7 @@ const uploadImageToFirebase = async ({
 
   const metadata = {
     contentType: "image/png",
-    customMetadata: {
-      user,
-    },
+    customMetadata: { user },
   };
 
   canvas.toBlob(async (blob) => {
@@ -24,11 +24,25 @@ const uploadImageToFirebase = async ({
       toast.error("Failed to create image blob.");
       return;
     }
+
     const storage = getStorage();
-    const fileRef = ref(storage, `${Date.now()}.png`);
+    const fileRef = ref(storage, filePath);
+
+    if (previousFilePath) {
+      previousFilePath.toString();
+      const previousFileRef = ref(storage, previousFilePath);
+
+      try {
+        await deleteObject(previousFileRef);
+      } catch (error) {
+        toast.error(`Failed to delete previous image: ${error.message}`);
+        return;
+      }
+    }
 
     try {
       await uploadBytes(fileRef, blob, metadata);
+
       toast.success("Image successfully uploaded!");
     } catch (error) {
       toast.error(`Upload failed: ${error.message}`);

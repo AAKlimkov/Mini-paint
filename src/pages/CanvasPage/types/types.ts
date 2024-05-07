@@ -8,4 +8,6 @@ export type DrawingTools =
 export type UploadImageParams = {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   user: string;
+  previousFilePath?: string;
+  filePath?: string;
 };

@@ -12,11 +12,7 @@ import { FilesListProps } from "../types/types";
 const FilesList: React.FC<FilesListProps> = ({ onImageClick, files }) => (
   <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
     {files.map((file, index) => (
-      <Card
-        key={index}
-        sx={{ maxWidth: 345 }}
-        onClick={() => onImageClick(file.url)}
-      >
+      <Card key={index} sx={{ maxWidth: 345 }}>
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
             {file.name}
@@ -36,6 +32,9 @@ const FilesList: React.FC<FilesListProps> = ({ onImageClick, files }) => (
             }}
           >
             Download
+          </Button>
+          <Button onClick={() => onImageClick(file.name, file.url)}>
+            Edit
           </Button>
         </CardActions>
       </Card>

@@ -1,9 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
-// import process from "process";
-
-// TODO move config to .env file
 
 export const firebaseConfig = {
   apiKey: "AIzaSyDt9ID4zlANYuxEGLFUa6rUZ7XTZDp_HCw",

@@ -41,7 +41,7 @@ const router = createBrowserRouter([
       </AuthWrapper>
     ),
   },
-  { path: "/edit-image/:imageName", element: <CanvasPage /> },
+  { path: "/edit-image/:imageUrl", element: <CanvasPage /> },
 ]);
 
 export default router;

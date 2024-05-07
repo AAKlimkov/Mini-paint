@@ -1,4 +1,4 @@
 export interface FilesListProps {
-  onImageClick: (imageUrl: string) => void;
+  onImageClick: (imageName: string, imageUrl: string) => void;
   files: Array<{ name: string; url: string }>;
 }
