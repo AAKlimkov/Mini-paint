@@ -8,39 +8,46 @@ import Typography from "@mui/material/Typography";
 
 import downloadFile from "../utils/downloadFile";
 import { FilesListProps } from "../types/types";
+import { useAppSelector } from "../../../store/hooks";
 
-const FilesList: React.FC<FilesListProps> = ({ onImageClick, files }) => (
-  <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-    {files.map((file, index) => (
-      <Card key={index} sx={{ maxWidth: 345 }}>
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {file.name}
-          </Typography>
-          <img
-            src={file.url}
-            alt={file.name}
-            style={{ width: "100%", height: "auto", marginBottom: "10px" }}
-          />
-        </CardContent>
-        <CardActions>
-          <Button
-            size="small"
-            onClick={(event) => {
-              event.stopPropagation();
-              downloadFile(file.url, file.name);
-            }}
-          >
-            Download
-          </Button>
-          <Button onClick={() => onImageClick(file.name, file.url)}>
-            Edit
-          </Button>
-        </CardActions>
-      </Card>
-    ))}
-    <Toaster />
-  </div>
-);
+const FilesList: React.FC<FilesListProps> = ({ onImageClick, files }) => {
+  const user = useAppSelector((state) => state.auth.user);
+
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+      {files.map((file, index) => (
+        <Card key={index} sx={{ maxWidth: 345 }}>
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="div">
+              {file.name}
+            </Typography>
+            <img
+              src={file.url}
+              alt={file.name}
+              style={{ width: "100%", height: "auto", marginBottom: "10px" }}
+            />
+          </CardContent>
+          <CardActions>
+            <Button
+              size="small"
+              onClick={(event) => {
+                event.stopPropagation();
+                downloadFile(file.url, file.name);
+              }}
+            >
+              Download
+            </Button>
+            <Button
+              onClick={() => onImageClick(file.name, file.url, file.user)}
+            >
+              {user.email === file.user ? "Edit" : "View"}
+            </Button>
+          </CardActions>
+        </Card>
+      ))}
+      <Toaster />
+    </div>
+  );
+};
 
 export default FilesList;

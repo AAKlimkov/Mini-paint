@@ -8,7 +8,7 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import { logout } from "../../features/auth/authSlice";
-import { useAppDispatch } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { firebaseConfig, storage } from "../../firebaseConfig";
 import SignOutAndCreateButtons from "./components/SignOutAndCreateButtons";
 import UserFilter from "./components/UserFilter";
@@ -25,7 +25,7 @@ const FilesPage: React.FC = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [userOptions, setUserOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const user = useAppSelector((state) => state.auth.user.email);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -75,12 +75,22 @@ const FilesPage: React.FC = () => {
   const handleCreateNewImage = () => {
     navigate("/create-image");
   };
-  const handleEditImage = (imageName: string, imageUrl: string) => {
-    navigate(`/edit-image/${encodeURIComponent(imageUrl)}`);
+  const handleEditImage = (
+    imageName: string,
+    imageUrl: string,
+    imageUser: string,
+  ) => {
+    navigate(`/edit-image/${encodeURIComponent(imageUrl)}`, {
+      state: { isEditable: imageUser === user },
+    });
   };
-  const handleOpenModal = (imageName?: string, imageUrl?: string) => {
+  const handleOpenModal = (
+    imageName?: string,
+    imageUrl?: string,
+    imageUser?: string,
+  ) => {
     setSelectedImageUrl(imageUrl);
-    handleEditImage(imageName, imageUrl);
+    handleEditImage(imageName, imageUrl, imageUser);
     setOpen(true);
   };
 

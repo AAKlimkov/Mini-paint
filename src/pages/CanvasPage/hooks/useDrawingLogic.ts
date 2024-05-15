@@ -13,6 +13,7 @@ const useDrawingLogic = (
   drawingTool: ToolType,
   lineWidth: number,
   color: string,
+  isEditable: boolean,
 ) => {
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
@@ -35,6 +36,7 @@ const useDrawingLogic = (
   }, [imageSrc]);
 
   useEffect(() => {
+    if (!isEditable) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -130,7 +132,7 @@ const useDrawingLogic = (
       canvas.removeEventListener("mouseup", stopDrawing);
       canvas.removeEventListener("mouseout", stopDrawing);
     };
-  }, [drawingTool, lineWidth, color, isDrawing, startPos]);
+  }, [drawingTool, lineWidth, color, isDrawing, startPos, isEditable]);
 
   return {
     initializeCanvas: (width: number, height: number) => {

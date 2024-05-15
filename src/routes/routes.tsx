@@ -37,7 +37,7 @@ const router = createBrowserRouter([
     path: "/create-image",
     element: (
       <AuthWrapper>
-        <CanvasPage />
+        <CanvasPage isEditable={true} />
       </AuthWrapper>
     ),
   },
